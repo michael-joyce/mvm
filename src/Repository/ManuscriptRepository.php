@@ -12,6 +12,7 @@ namespace App\Repository;
 
 use App\Entity\Manuscript;
 use Doctrine\Persistence\ManagerRegistry;
+use Nines\UserBundle\Entity\User;
 
 /**
  * ManuscriptRepository.
@@ -34,9 +35,12 @@ class ManuscriptRepository extends \Doctrine\Bundle\DoctrineBundle\Repository\Se
         return $qb->getQuery()->execute();
     }
 
-    public function searchQuery($q) {
+    public function searchQuery($q, ?User $user) {
         $qb = $this->createQueryBuilder('e');
         $qb->andWhere('MATCH(e.callNumber, e.description) AGAINST (:q BOOLEAN) > 0.1');
+        if( ! $user) {
+            $qb->andWhere('e.complete=1');
+        }
         $qb->orderBy('e.callNumber', 'ASC');
         $qb->setParameter('q', $q);
 

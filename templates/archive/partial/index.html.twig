@@ -11,7 +11,13 @@
             <tr>
                 <td><a href="{{ path('archive_show', {'id': archive.id}) }}">{{ archive }}</a></td>
                 <td>{{ archive.description|raw }}</td>
-                <td class="number">{{ archive.manuscripts|length }}</td>
+                <td class="number">
+                    {% if is_granted('ROLE_USER') %}
+                        {{ archive.manuscripts|length }}
+                    {% else %}
+                        {{ archive.manuscripts|filter(m => m.complete)|length }}
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </tbody>

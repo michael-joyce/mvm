@@ -47,6 +47,9 @@ class ManuscriptController extends AbstractController implements PaginatorAwareI
         $em = $this->getDoctrine()->getManager();
         $qb = $em->createQueryBuilder();
         $qb->select('e')->from(Manuscript::class, 'e')->orderBy('e.callNumber', 'ASC');
+        if( ! $this->getUser()) {
+            $qb->andWhere('e.complete=1');
+        }
         $query = $qb->getQuery();
 
         $manuscripts = $this->paginator->paginate($query, $request->query->getint('page', 1), 24);
@@ -101,7 +104,7 @@ class ManuscriptController extends AbstractController implements PaginatorAwareI
     public function searchAction(Request $request, ManuscriptRepository $repo) {
         $q = $request->query->get('q');
         if ($q) {
-            $query = $repo->searchQuery($q);
+            $query = $repo->searchQuery($q, $this->getUser());
 
             $manuscripts = $this->paginator->paginate($query, $request->query->getInt('page', 1), 24);
         } else {

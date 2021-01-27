@@ -15,5 +15,10 @@
 {% endblock %}
 
 {% block body %}
-    {% include 'manuscript/partial/gallery.html.twig' with {'manuscripts': archive.manuscripts|sort((a,b) => a.callNumber <=> b.callNumber)} %}
+    {% if is_granted('ROLE_USER') %}
+        {% set ms=archive.manuscripts %}
+    {% else %}
+        {% set ms=archive.manuscripts|filter(m => m.complete) %}
+    {% endif %}
+    {% include 'manuscript/partial/gallery.html.twig' with {'manuscripts': ms|sort((a,b) => a.callNumber <=> b.callNumber)} %}
 {% endblock %}
